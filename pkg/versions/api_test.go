@@ -28,7 +28,7 @@ func TestAPI_GetVersion(t *testing.T) {
 	}
 
 	var tests = []Test{
-		{Name: "ReturnVersion", Prefix: "v", Suffix: "", Version: "0.0.0"},
+		{Name: "ReturnVersion", Prefix: "v", Suffix: "", Version: "0.1.0"},
 	}
 
 	for _, test := range tests {
@@ -110,7 +110,7 @@ func TestAPI_GetVersionOrDefault(t *testing.T) {
 	}
 
 	var tests = []Test{
-		{Name: "ReturnVersionWithoutError", Prefix: "v", Suffix: "", Version: "0.0.0"},
+		{Name: "ReturnVersionWithoutError", Prefix: "v", Suffix: "", Version: "0.1.0"},
 	}
 
 	for _, test := range tests {

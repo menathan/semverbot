@@ -36,7 +36,7 @@ func (api API) GetVersion() (currentVersion string, err error) {
 	// strip all newlines
 	var versions = strings.Fields(tags)
 
-	if currentVersion, err = semver.Find(api.Prefix, api.Suffix, versions); err != nil {
+	if currentVersion, err = semver.Find(api.Prefix, versions); err != nil {
 		return currentVersion, err
 	}
 
@@ -68,7 +68,7 @@ func (api API) PredictVersion(version string, mode modes.Mode) (string, error) {
 
 	log.Info().Msg("predicting version...")
 
-	version, err = mode.Increment(api.Prefix, api.Suffix, version)
+	version, err = mode.Increment(api.Prefix, version)
 
 	log.Info().Msg(version)
 

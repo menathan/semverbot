@@ -15,7 +15,7 @@ func Trim(prefix string, suffix string, version string) (string, error) {
 	var versionWithoutPrefix = strings.Replace(version, prefix, prefix, 1)
 	var versionWithoutPrefixOrSuffix = strings.Replace(versionWithoutPrefix, suffix, suffix, 1)
 
-	if semverVersion, err = Parse(prefix, suffix, versionWithoutPrefixOrSuffix); err != nil {
+	if semverVersion, err = Parse(prefix, versionWithoutPrefixOrSuffix); err != nil {
 		return version, err
 	}
 

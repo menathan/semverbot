@@ -25,8 +25,9 @@ func TestTrim(t *testing.T) {
 		{Name: "Minor", Major: "0", Minor: "2", Patch: "0"},
 		{Name: "Major", Major: "3", Minor: "0", Patch: "0"},
 		{Name: "DiscardPrefix", Major: "1", Minor: "0", Patch: "0", Prefix: "v"},
-		{Name: "DiscardSuffix", Major: "1", Minor: "0", Patch: "0", Suffix: "a"},
-		{Name: "DiscardSuffixAlt", Major: "1", Minor: "0", Patch: "0", Suffix: "-alt"},
+		{Name: "DiscardSuffix", Major: "1", Minor: "0", Patch: "0", Suffix: "-any.valid+version"},
+		{Name: "DiscardSuffixAsPre", Major: "1", Minor: "0", Patch: "0", Suffix: "-pre"},
+		{Name: "DiscardSuffixAsBuild", Major: "1", Minor: "0", Patch: "0", Suffix: "+001"},
 		{Name: "DiscardPrebuild", Major: "2", Minor: "0", Patch: "0", Prebuild: "-pre+001"},
 	}
 

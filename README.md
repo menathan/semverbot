@@ -206,10 +206,10 @@ Note: `sbot` will always display the version without the prefix.
 
 ### git.tags.suffix
 
-In case you need a version suffix, this option enables you to set whatever you would like to work with.
+In case you need a version suffix, this option enables you to set whatever you would like to work with as long as the suffix meets the Semver 2.0.0 specification.
 By default, no suffix is used.
 
-If a suffix is configured, then sbot predictions are only based on the latest semver tag including the suffix.
+This is especially useful for suffixes such as `-pre` or `-pre+build` that do not play any role in determining the current semantic version or predicting the next semantic version.
 
 Note: `sbot` will always display the version without the suffix.
 
@@ -254,7 +254,7 @@ version of the configuration property name, prefixed with `SBOT_`. For example, 
 property, you can set the `SBOT_GIT_TAGS_SUFFIX` environment variable.
 
 ```shell
-export SBOT_GIT_TAGS_SUFFIX="-beta"
+export SBOT_GIT_TAGS_SUFFIX="-pre+build" 
 sbot release version
 ```
 
