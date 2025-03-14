@@ -22,7 +22,7 @@ var (
 	// DefaultGitTagsPrefix the default prefix prepended to git tags.
 	DefaultGitTagsPrefix = internal.DefaultGitTagsPrefix
 
-	// DefaultGitTagsSuffix the default suffix prepended to git tags.
+	// DefaultGitTagsSuffix the default suffix append to git tags.
 	DefaultGitTagsSuffix = internal.DefaultGitTagsSuffix
 
 	// DefaultMode the default mode for incrementing versions.
@@ -30,6 +30,12 @@ var (
 
 	// DefaultVersion the default version when no other version can be found.
 	DefaultVersion = internal.DefaultVersion
+
+	// DefaultSemVerParseMode the mode used to parse semver versions.
+	DefaultSemVerParseMode = internal.SemVerParseMode
+
+	// DefaultSemVerPerPrefix whether to strictly match the prefix when getting and predicting versions.
+	DefaultSemVerPerPrefix = internal.SemVerPerPrefix
 )
 
 func GetDefaultConfig() string {
@@ -50,6 +56,10 @@ patch = ["fix", "bug"]
 minor = ["feature"]
 major = ["release"]
 
+[semver.config]
+parse-mode = "%s"
+per-prefix = %t
+
 [modes]
 
 [modes.git-branch]
@@ -64,6 +74,8 @@ delimiters = "%s"
 		DefaultMode,
 		DefaultGitTagsPrefix,
 		DefaultGitTagsSuffix,
+		DefaultSemVerParseMode,
+		DefaultSemVerPerPrefix,
 		DefaultGitBranchDelimiters,
 		DefaultGitCommitDelimiters,
 	)

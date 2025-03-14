@@ -24,4 +24,10 @@ const (
 
 	// SemverMapConfigKey key for the semver map config.
 	SemverMapConfigKey = "semver"
+
+	// SemVerParseModeConfigKey key for the semver parse mode config.
+	SemVerParseModeConfigKey = "semver.config.parse-mode"
+
+	// SemVerPerPrefixConfigKey key for the strict match on prefix config.
+	SemVerPerPrefixConfigKey = "semver.config.per-prefix"
 )

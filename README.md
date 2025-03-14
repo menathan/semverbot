@@ -159,6 +159,10 @@ patch = ["fix", "bug"]
 minor = ["feature"]
 major = ["release"]
 
+[semver.config]
+parse-mode = "tolerant"
+per-prefix = false
+
 [modes]
 
 [modes.git-branch]
@@ -221,6 +225,20 @@ A mapping of semver levels and words, which are matched against git information.
 Whenever a match happens, `sbot` will increment the corresponding level.
 
 See [Modes](#modes) for documentation about the supported modes.
+
+### semver.config.parse-mode
+
+The parse mode determines how strict semver parsing is. Default is `tolerant`, which allows for using a common `v` 
+prefix and `pre` and `build` suffixes. Other option is `strict`, which only allows a semver without any prefix or suffix.
+
+### semver.config.per-prefix
+
+The per-prefix option allows for using different prefixes for different semver levels. This is useful when you have 
+different prefixes for different applications or components, that you want to version independently of each other, which
+is common in a monorepo setup.
+
+Setting this option to true also allows for even more tolerant tag parsing, as the prefix is always used to determine 
+the semver level, regardless of the semver parse mode.
 
 ### modes
 

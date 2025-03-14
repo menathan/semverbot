@@ -14,6 +14,8 @@ type PredictVersionOptions struct {
 	GitTagsSuffix       string
 	Mode                string
 	SemverMap           semver.Map
+	SemVerPerPrefix     bool
+	SemVerParseMode     string
 }
 
 // PredictVersion predicts a version based on a modes.Mode and a modes.Map.
@@ -24,7 +26,7 @@ func PredictVersion(options *PredictVersionOptions) (prediction string, err erro
 	var gitCommitMode = modes.NewGitCommitMode(options.GitCommitDelimiters, options.SemverMap)
 
 	var versionAPI = versions.NewAPI(options.GitTagsPrefix, options.GitTagsSuffix)
-	var version = versionAPI.GetVersionOrDefault(options.DefaultVersion)
+	var version = versionAPI.GetVersionOrDefault(options.DefaultVersion, options.SemVerParseMode, options.SemVerPerPrefix, options.GitTagsPrefix)
 
 	var modeAPI = modes.NewAPI(gitBranchMode, gitCommitMode)
 	var mode = modeAPI.SelectMode(options.Mode)

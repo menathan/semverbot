@@ -15,6 +15,10 @@ patch = ["fix", "bug"]
 minor = ["feature"]
 major = ["release"]
 
+[semver.config]
+parse-mode = "tolerant"
+per-prefix = false
+
 [modes]
 
 [modes.git-branch]
