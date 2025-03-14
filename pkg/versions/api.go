@@ -26,38 +26,35 @@ func NewAPI(prefix string, suffix string) API {
 // GetVersion gets the latest valid semver version from the git tags.
 // The tag is trimmed because git adds newlines to the underlying command.
 // Returns the current version or an error if the GitAPI failed.
-func (api API) GetVersion() (currentVersion string, err error) {
+func (api API) GetVersion(semVerParseMode string, semVerPerPrefix bool, prefix string) (currentVersion string, err error) {
 	var tags string
-
-	if tags, err = api.GitAPI.GetTags(); err != nil {
+	if semVerPerPrefix {
+		if tags, err = api.GitAPI.GetTagsWithPrefix(api.Prefix); err != nil {
+			return currentVersion, err
+		}
+	} else {
+		if tags, err = api.GitAPI.GetTags(); err != nil {
+			return currentVersion, err
+		}
+	}
+	var versions = strings.Fields(tags) // strip all newlines
+	if currentVersion, err = semver.Find(versions, semVerParseMode, semVerPerPrefix, prefix); err != nil {
 		return currentVersion, err
 	}
-
-	// strip all newlines
-	var versions = strings.Fields(tags)
-
-	if currentVersion, err = semver.Find(api.Prefix, versions); err != nil {
-		return currentVersion, err
-	}
-
-	return semver.Trim(api.Prefix, api.Suffix, currentVersion)
+	return semver.Trim(currentVersion)
 }
 
 // GetVersionOrDefault gets the current version or a default version if it failed.
 // Returns the current version or a default version.
-func (api API) GetVersionOrDefault(defaultVersion string) (version string) {
+func (api API) GetVersionOrDefault(defaultVersion string, semVerParseMode string, semVerPerPrefix bool, prefix string) (version string) {
 	var err error
-
 	log.Info().Msg("getting version...")
-
-	if version, err = api.GetVersion(); err != nil {
+	if version, err = api.GetVersion(semVerParseMode, semVerPerPrefix, prefix); err != nil {
 		log.Debug().Err(err).Msg("")
 		log.Warn().Msg("falling back to default version")
 		version = defaultVersion
 	}
-
-	log.Info().Msg(version)
-
+	log.Info().Msg("found " + version)
 	return version
 }
 
@@ -65,13 +62,9 @@ func (api API) GetVersionOrDefault(defaultVersion string) (version string) {
 // Returns the next version or an error if the increment failed.
 func (api API) PredictVersion(version string, mode modes.Mode) (string, error) {
 	var err error
-
 	log.Info().Msg("predicting version...")
-
-	version, err = mode.Increment(api.Prefix, version)
-
-	log.Info().Msg(version)
-
+	version, err = mode.Increment(version)
+	log.Info().Msg("predicted " + version)
 	return version, err
 }
 
@@ -81,6 +74,7 @@ func (api API) ReleaseVersion(version string) (err error) {
 	log.Info().Msg("releasing version...")
 	var prefixedVersion = AddPrefix(version, api.Prefix)
 	var prefixedAndSuffixedVersion = AddSuffix(prefixedVersion, api.Suffix)
+	log.Info().Msg("creating tag '" + prefixedAndSuffixedVersion + "'")
 	return api.GitAPI.CreateAnnotatedTag(prefixedAndSuffixedVersion)
 }
 
@@ -90,6 +84,7 @@ func (api API) PushVersion(version string) (err error) {
 	log.Info().Msg("pushing version...")
 	var prefixedVersion = AddPrefix(version, api.Prefix)
 	var prefixedAndSuffixedVersion = AddSuffix(prefixedVersion, api.Suffix)
+	log.Info().Msg("pushing tag '" + prefixedAndSuffixedVersion + "'")
 	return api.GitAPI.PushTag(prefixedAndSuffixedVersion)
 }
 
@@ -97,23 +92,17 @@ func (api API) PushVersion(version string) (err error) {
 // Returns and error if anything went wrong. Errors from making the git repo unshallow are ignored.
 func (api API) UpdateVersion() (err error) {
 	log.Info().Msg("updating version...")
-
-	var output string
-
 	log.Info().Msg("fetching unshallow repository...")
-
+	var output string
 	if output, err = api.GitAPI.FetchUnshallow(); err != nil {
 		log.Debug().Err(err).Msg("")
 		log.Warn().Msg("ignoring failed unshallow fetch for now, repository might already be complete")
 	} else {
 		log.Debug().Msg(strings.Trim(output, "\n"))
 	}
-
 	log.Info().Msg("fetching tags...")
-
 	if output, err = api.GitAPI.FetchTags(); err == nil {
 		log.Debug().Msg(strings.Trim(output, "\n"))
 	}
-
 	return err
 }

@@ -148,6 +148,8 @@ func LoadDefaultConfigValues() {
 	viper.SetDefault(cli.ModesGitBranchDelimitersConfigKey, cli.DefaultGitBranchDelimiters)
 	viper.SetDefault(cli.ModesGitCommitDelimitersConfigKey, cli.DefaultGitCommitDelimiters)
 	viper.SetDefault(cli.SemverMapConfigKey, semver.Map{})
+	viper.SetDefault(cli.SemVerParseModeConfigKey, cli.DefaultSemVerParseMode)
+	viper.SetDefault(cli.SemVerPerPrefixConfigKey, cli.DefaultSemVerPerPrefix)
 }
 
 // LoadFlagsIntoConfig loads root command flags.

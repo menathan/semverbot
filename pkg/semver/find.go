@@ -2,31 +2,26 @@ package semver
 
 import (
 	"fmt"
-	"strings"
 
 	blangsemver "github.com/blang/semver/v4"
+	"github.com/rs/zerolog/log"
 )
 
 // Find finds the biggest valid semver version in a slice of strings.
 // The initial order of the versions does not matter.
 // Returns the biggest valid semver version if found, otherwise an error stating no valid semver version has been found.
-func Find(prefix string, versions []string) (found string, err error) {
+func Find(versions []string, semVerParseMode string, semVerPerPrefix bool, prefix string) (found string, err error) {
 	var parsedVersions blangsemver.Versions
 	var parsedVersion blangsemver.Version
 
-	var filteredVersions []string
 	for _, version := range versions {
-		if prefix == "v" || strings.Contains(version, prefix) {
-			filteredVersions = append(filteredVersions, version)
+		if parsedVersion, err = ParseWithOptions(version, semVerParseMode, semVerPerPrefix, prefix); err != nil {
+			log.Warn().Msg("could not parse tag '" + version + "'")
 		}
-	}
-
-	for _, version := range filteredVersions {
-		if parsedVersion, err = Parse(prefix, version); err != nil {
-			continue
+		if !(parsedVersion.Major == 0 && parsedVersion.Minor == 0 && parsedVersion.Patch == 0) {
+			log.Debug().Msg("parsed tag '" + version + "' as version " + parsedVersion.FinalizeVersion())
+			parsedVersions = append(parsedVersions, parsedVersion)
 		}
-
-		parsedVersions = append(parsedVersions, parsedVersion)
 	}
 
 	if len(parsedVersions) == 0 {
@@ -37,13 +32,5 @@ func Find(prefix string, versions []string) (found string, err error) {
 
 	var targetVersion = parsedVersions[len(parsedVersions)-1]
 
-	// necessary because blangsemver's Version.String() strips any prefix
-	for _, version := range filteredVersions {
-		if strings.Contains(version, targetVersion.String()) {
-			found = version
-			break
-		}
-	}
-
-	return found, nil
+	return targetVersion.String(), nil
 }

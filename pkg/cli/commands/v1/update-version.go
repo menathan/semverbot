@@ -1,12 +1,10 @@
 package v1
 
 import (
-	"github.com/rs/zerolog/log"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-
 	"github.com/restechnica/semverbot/pkg/cli"
 	"github.com/restechnica/semverbot/pkg/core"
+	"github.com/rs/zerolog/log"
+	"github.com/spf13/cobra"
 )
 
 // NewUpdateVersionCommand creates a new update version command.
@@ -25,12 +23,7 @@ func NewUpdateVersionCommand() *cobra.Command {
 func UpdateVersionCommandRunE(cmd *cobra.Command, args []string) (err error) {
 	log.Debug().Str("command", "v1.update-version").Msg("starting run...")
 
-	var updateOptions = &core.UpdateVersionOptions{
-		GitTagsPrefix: viper.GetString(cli.GitTagsPrefixConfigKey),
-		GitTagsSuffix: viper.GetString(cli.GitTagsSuffixConfigKey),
-	}
-
-	if err = core.UpdateVersion(updateOptions); err != nil {
+	if err = core.UpdateVersion(); err != nil {
 		err = cli.NewCommandError(err)
 	}
 

@@ -159,6 +159,10 @@ patch = ["fix", "bug"]
 minor = ["feature"]
 major = ["release"]
 
+[semver.config]
+parse-mode = "tolerant"
+per-prefix = false
+
 [modes]
 
 [modes.git-branch]
@@ -200,8 +204,6 @@ Without this config `sbot` might show unexpected behaviour.
 Different platforms and environments work with different (or without) version prefixes. This option enables you to set whatever prefix you would like to work with.
 The `"v"` prefix, e.g. `v1.0.1` is used by default due to its popularity, e.g. some Golang tools completely depend on it.
 
-If a prefix is configured, then sbot predictions are only based on the latest semver tag including the prefix.
-
 Note: `sbot` will always display the version without the prefix.
 
 ### git.tags.suffix
@@ -221,6 +223,20 @@ A mapping of semver levels and words, which are matched against git information.
 Whenever a match happens, `sbot` will increment the corresponding level.
 
 See [Modes](#modes) for documentation about the supported modes.
+
+### semver.config.parse-mode
+
+The parse mode determines how strict semver parsing is. Default is `tolerant`, which allows for using a common `v` 
+prefix and `pre` and `build` suffixes. Other option is `strict`, which only allows a semver without any prefix or suffix.
+
+### semver.config.per-prefix
+
+The per-prefix option allows for using different prefixes for different semver levels. This is useful when you have 
+different prefixes for different applications or components, that you want to version independently of each other, which
+is common in a monorepo setup.
+
+Setting this option to true also allows for even more tolerant tag parsing, as the prefix is always used to determine 
+the semver level, regardless of the semver parse mode.
 
 ### modes
 

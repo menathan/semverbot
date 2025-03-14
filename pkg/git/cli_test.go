@@ -130,6 +130,21 @@ func TestCLI_GetTags(t *testing.T) {
 	})
 }
 
+func TestCLI_GetTagsWithPrefix(t *testing.T) {
+	t.Run("ReturnErrorOnCommanderError", func(t *testing.T) {
+		var want = fmt.Errorf("some-error")
+
+		var cmder = mocks.NewMockCommander()
+		cmder.On("Output", mock.Anything, mock.Anything).Return("value", want)
+
+		var gitCLI = CLI{Commander: cmder}
+		var _, got = gitCLI.GetTagsWithPrefix("myprefix-")
+
+		assert.Error(t, got)
+		assert.Equal(t, want, got, `want: "%s, got: "%s"`, want, got)
+	})
+}
+
 func TestCLI_PushTag(t *testing.T) {
 	t.Run("ReturnErrorOnCommanderError", func(t *testing.T) {
 		var want = fmt.Errorf("some-error")

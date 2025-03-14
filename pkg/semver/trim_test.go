@@ -10,13 +10,13 @@ import (
 
 func TestTrim(t *testing.T) {
 	type Test struct {
-		Name     string
-		Major    string
-		Minor    string
-		Patch    string
-		Prebuild string
-		Prefix   string
-		Suffix   string
+		Name        string
+		Prefix      string
+		Major       string
+		Minor       string
+		Patch       string
+		Suffix      string
+		PreAndBuild string
 	}
 
 	var tests = []Test{
@@ -24,23 +24,23 @@ func TestTrim(t *testing.T) {
 		{Name: "Patch", Major: "0", Minor: "0", Patch: "1"},
 		{Name: "Minor", Major: "0", Minor: "2", Patch: "0"},
 		{Name: "Major", Major: "3", Minor: "0", Patch: "0"},
-		{Name: "DiscardPrefix", Major: "1", Minor: "0", Patch: "0", Prefix: "v"},
-		{Name: "DiscardSuffix", Major: "1", Minor: "0", Patch: "0", Suffix: "-any.valid+version"},
-		{Name: "DiscardSuffixAsPre", Major: "1", Minor: "0", Patch: "0", Suffix: "-pre"},
-		{Name: "DiscardSuffixAsBuild", Major: "1", Minor: "0", Patch: "0", Suffix: "+001"},
-		{Name: "DiscardPrebuild", Major: "2", Minor: "0", Patch: "0", Prebuild: "-pre+001"},
+		{Name: "DiscardPrefix", Prefix: "v", Major: "1", Minor: "0", Patch: "0"},
+		{Name: "DiscardPreAndBuildWithFull", Major: "1", Minor: "0", Patch: "0", PreAndBuild: "-any.valid+version"},
+		{Name: "DiscardPreAndBuildWithFull2", Major: "2", Minor: "0", Patch: "0", PreAndBuild: "-pre+001"},
+		{Name: "DiscardPreAndBuildWithPre", Major: "1", Minor: "0", Patch: "0", PreAndBuild: "-pre"},
+		{Name: "DiscardPreAndBuildWithBuild", Major: "1", Minor: "0", Patch: "0", PreAndBuild: "+001"},
 	}
 
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
 			var version = fmt.Sprintf(`%s%s.%s.%s%s%s`, test.Prefix, test.Major, test.Minor, test.Patch,
-				test.Suffix, test.Prebuild)
+				test.Suffix, test.PreAndBuild)
 
 			var want = strings.ReplaceAll(version, test.Prefix, "")
 			want = strings.ReplaceAll(want, test.Suffix, "")
-			want = strings.ReplaceAll(want, test.Prebuild, "")
+			want = strings.ReplaceAll(want, test.PreAndBuild, "")
 
-			var got, err = Trim(test.Prefix, test.Suffix, version)
+			var got, err = Trim(version)
 
 			assert.Equal(t, want, got, `want: "%s", got: "%s"`, want, got)
 
@@ -52,8 +52,8 @@ func TestTrim(t *testing.T) {
 				assert.False(t, strings.HasSuffix(got, test.Suffix))
 			}
 
-			if test.Prebuild != "" {
-				assert.False(t, strings.HasSuffix(got, test.Prebuild))
+			if test.PreAndBuild != "" {
+				assert.False(t, strings.HasSuffix(got, test.PreAndBuild))
 			}
 
 			assert.NoError(t, err)
@@ -71,7 +71,7 @@ func TestTrim(t *testing.T) {
 
 	for _, test := range errorTests {
 		t.Run(test.Name, func(t *testing.T) {
-			var _, got = Trim("v", "a", test.Version)
+			var _, got = Trim(test.Version)
 			assert.Error(t, got)
 		})
 	}
