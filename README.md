@@ -208,11 +208,9 @@ Note: `sbot` will always display the version without the prefix.
 
 ### git.tags.suffix
 
-In case you need a version suffix, this option enables you to set whatever you would like to work with as long as the suffix meets the Semver 2.0.0 specification.
+In case you need a version suffix, this option enables you to set whatever you would like to work with as long as the suffix meets the Semver 2.0.0 specification. This is the case with suffixes such as `-alpha` or `-prerelease+meta`.
+
 By default, no suffix is used.
-
-This is especially useful for suffixes such as `-pre` or `-pre+build` that do not play any role in determining the current semantic version or predicting the next semantic version.
-
 Note: `sbot` will always display the version without the suffix.
 
 ### semver
