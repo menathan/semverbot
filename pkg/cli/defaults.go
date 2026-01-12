@@ -22,7 +22,7 @@ var (
 	// DefaultGitTagsPrefix the default prefix prepended to git tags.
 	DefaultGitTagsPrefix = internal.DefaultGitTagsPrefix
 
-	// DefaultGitTagsSuffix the default suffix append to git tags.
+	// DefaultGitTagsSuffix the default suffix appended to git tags.
 	DefaultGitTagsSuffix = internal.DefaultGitTagsSuffix
 
 	// DefaultMode the default mode for incrementing versions.
