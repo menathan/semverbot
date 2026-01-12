@@ -73,7 +73,7 @@ func (api CLI) GetTags() (tags string, err error) {
 // GetTagsWithPrefix gets only tags with certain prefix, both lightweight and annotated.
 // Returns a string of newline separated tags, sorted by version in descending order.
 func (api CLI) GetTagsWithPrefix(prefix string) (tags string, err error) {
-	var filter = prefix + "*"
+	var filter = prefix + "[0-9]*"
 	return api.Commander.Output("git", "tag", "--sort=-version:refname", "--list", filter)
 }
 

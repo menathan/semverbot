@@ -224,8 +224,16 @@ See [Modes](#modes) for documentation about the supported modes.
 
 ### semver.config.parse-mode
 
-The parse mode determines how strict semver parsing is. Default is `tolerant`, which allows for using a common `v` 
-prefix and `pre` and `build` suffixes. Other option is `strict`, which only allows a semver without any prefix or suffix.
+The parse mode determines how strict semver parsing is. Default is `tolerant`.
+
+- **`tolerant`** (default): Allows common variations like the `v` prefix (e.g., `v1.0.0`) and incomplete versions (e.g., `2.1`). Also supports SemVer 2.0.0 prerelease and build metadata (e.g., `1.0.0-alpha`, `1.0.0+build`, `1.0.0-pre+build`).
+
+- **`strict`**: Requires exact SemVer 2.0.0 format without prefixes or incomplete versions. However, it **does allow** SemVer-compliant prerelease and build metadata, such as:
+  - `1.0.0-alpha` (prerelease)
+  - `1.0.0+build.123` (build metadata)
+  - `1.0.0-pre+build` (both prerelease and build metadata)
+  
+  Strict mode will reject versions like `v1.0.0` (prefix) or `2.1` (incomplete).
 
 ### semver.config.per-prefix
 
