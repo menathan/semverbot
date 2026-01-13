@@ -34,24 +34,28 @@ func ReleaseVersionCommandPreRunE(cmd *cobra.Command, args []string) (err error)
 func ReleaseVersionCommandRunE(cmd *cobra.Command, args []string) (err error) {
 	log.Debug().Str("command", "v1.release-version").Msg("starting run...")
 
-	var predictOptions = &core.PredictVersionOptions{
+	var options = &core.PredictVersionOptions{
 		DefaultVersion:      cli.DefaultVersion,
 		GitBranchDelimiters: viper.GetString(cli.ModesGitBranchDelimitersConfigKey),
 		GitCommitDelimiters: viper.GetString(cli.ModesGitCommitDelimitersConfigKey),
-		GitTagsPrefix:       viper.GetString(cli.GitTagsPrefixConfigKey),
-		GitTagsSuffix:       viper.GetString(cli.GitTagsSuffixConfigKey),
+		Prefix:              viper.GetString(cli.GitTagsPrefixConfigKey),
+		Suffix:              viper.GetString(cli.GitTagsSuffixConfigKey),
 		Mode:                viper.GetString(cli.ModeConfigKey),
 		SemverMap:           viper.GetStringMapStringSlice(cli.SemverMapConfigKey),
+		SemVerParseMode:     viper.GetString(cli.SemVerParseModeConfigKey),
+		SemVerPerPrefix:     viper.GetBool(cli.SemVerPerPrefixConfigKey),
 	}
 
 	log.Debug().
-		Str("default", predictOptions.DefaultVersion).
-		Str("mode", predictOptions.Mode).
-		Str("prefix", predictOptions.GitTagsPrefix).
-		Str("suffix", predictOptions.GitTagsSuffix).
+		Str("default", options.DefaultVersion).
+		Str("mode", options.Mode).
+		Str("prefix", options.Prefix).
+		Str("suffix", options.Suffix).
+		Str("semver-parse-mode", options.SemVerParseMode).
+		Bool("semver-per-prefix", options.SemVerPerPrefix).
 		Msg("options")
 
-	if err = core.ReleaseVersion(predictOptions); err != nil {
+	if err = core.ReleaseVersion(options); err != nil {
 		err = cli.NewCommandError(err)
 	}
 

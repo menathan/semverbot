@@ -69,6 +69,11 @@ func (fake *FakeGitAPI) GetTags() (tags string, err error) {
 	return tags, err
 }
 
+// GetTagsWithPrefix does nothing
+func (fake *FakeGitAPI) GetTagsWithPrefix(prefix string) (tags string, err error) {
+	return tags, err
+}
+
 // PushTag pushes a fake tag.
 func (fake *FakeGitAPI) PushTag(tag string) (err error) {
 	fake.PushedTags = append(fake.PushedTags, tag)

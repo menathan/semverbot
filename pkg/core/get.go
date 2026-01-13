@@ -5,14 +5,16 @@ import (
 )
 
 type GetVersionOptions struct {
-	GitTagPrefix   string
-	GitTagSuffix   string
-	DefaultVersion string
+	DefaultVersion  string
+	Prefix          string
+	Suffix          string
+	SemVerParseMode string
+	SemVerPerPrefix bool
 }
 
 // GetVersion gets the current version.
 // Returns the current version.
 func GetVersion(options *GetVersionOptions) string {
-	var versionAPI = versions.NewAPI(options.GitTagPrefix, options.GitTagSuffix)
-	return versionAPI.GetVersionOrDefault(options.DefaultVersion)
+	var versionAPI = versions.NewAPI(options.Prefix, options.Suffix)
+	return versionAPI.GetVersionOrDefault(options.DefaultVersion, options.SemVerParseMode, options.SemVerPerPrefix, options.Prefix)
 }

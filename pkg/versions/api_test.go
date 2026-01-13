@@ -13,6 +13,7 @@ import (
 	"github.com/restechnica/semverbot/pkg/cli"
 	"github.com/restechnica/semverbot/pkg/git"
 	"github.com/restechnica/semverbot/pkg/modes"
+	"github.com/restechnica/semverbot/pkg/semver/semverparse"
 )
 
 func init() {
@@ -21,28 +22,120 @@ func init() {
 
 func TestAPI_GetVersion(t *testing.T) {
 	type Test struct {
-		Name    string
-		Prefix  string
-		Suffix  string
-		Version string
+		Name            string
+		GitTag          string
+		ExpectedVersion string
+		SemVerParseMode string
+		SemVerPerPrefix bool
+		Prefix          string
 	}
 
 	var tests = []Test{
-		{Name: "ReturnVersion", Prefix: "v", Suffix: "", Version: "0.0.0"},
+		{Name: "GetVersionStrict", GitTag: "0.1.0", ExpectedVersion: "0.1.0", SemVerParseMode: semverparse.Strict, SemVerPerPrefix: false, Prefix: ""},
+
+		{Name: "GetVersionTolerant", GitTag: "1.0.0", ExpectedVersion: "1.0.0", SemVerParseMode: semverparse.Tolerant, SemVerPerPrefix: false, Prefix: ""},
+		{Name: "GetVersionTolerant", GitTag: "1.0", ExpectedVersion: "1.0.0", SemVerParseMode: semverparse.Tolerant, SemVerPerPrefix: false, Prefix: ""},
+		{Name: "GetVersionTolerant", GitTag: "1", ExpectedVersion: "1.0.0", SemVerParseMode: semverparse.Tolerant, SemVerPerPrefix: false, Prefix: ""},
+		{Name: "GetVersionTolerantWithPrefixInTagAndConfig", GitTag: "v1.0.0", ExpectedVersion: "1.0.0", SemVerParseMode: semverparse.Tolerant, SemVerPerPrefix: false, Prefix: "v"},
+		{Name: "GetVersionTolerantWithPrefixInTagButDifferentInConfig", GitTag: "v1.0.0", ExpectedVersion: "1.0.0", SemVerParseMode: semverparse.Tolerant, SemVerPerPrefix: false, Prefix: ""},
+		{Name: "GetVersionTolerantWithPrefixInConfigButNotInTag", GitTag: "1.0.0", ExpectedVersion: "1.0.0", SemVerParseMode: semverparse.Tolerant, SemVerPerPrefix: false, Prefix: "v"},
+		{Name: "GetVersionTolerantWithPrefixInConfigButNotInTag2", GitTag: "1.0.0", ExpectedVersion: "1.0.0", SemVerParseMode: semverparse.Tolerant, SemVerPerPrefix: false, Prefix: "abc"},
+
+		{Name: "GetVersionTolerantWithSemVerPerPrefix", GitTag: "1.0.0", ExpectedVersion: "1.0.0", SemVerParseMode: semverparse.Tolerant, SemVerPerPrefix: true, Prefix: ""},
+		{Name: "GetVersionTolerantWithSemVerPerPrefixWithPrefixInTagAndConfig1", GitTag: "v1.0.0", ExpectedVersion: "1.0.0", SemVerParseMode: semverparse.Tolerant, SemVerPerPrefix: true, Prefix: "v"},
+		{Name: "GetVersionTolerantWithSemVerPerPrefixWithPrefixInTagAndConfig2", GitTag: "abc1.0.0", ExpectedVersion: "1.0.0", SemVerParseMode: semverparse.Tolerant, SemVerPerPrefix: true, Prefix: "abc"},
+		{Name: "GetVersionTolerantWithSemVerPerPrefixWithPrefixInTagAndConfig3", GitTag: "foo/1.0.0", ExpectedVersion: "1.0.0", SemVerParseMode: semverparse.Tolerant, SemVerPerPrefix: true, Prefix: "foo/"},
+		{Name: "GetVersionTolerantWithSemVerPerPrefixWithPrefixInTagAndConfig4", GitTag: "bar@1.0.0", ExpectedVersion: "1.0.0", SemVerParseMode: semverparse.Tolerant, SemVerPerPrefix: true, Prefix: "bar@"},
 	}
 
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
 			var cmder = mocks.NewMockCommander()
-			cmder.On("Output", mock.Anything, mock.Anything).Return(test.Version, nil)
+			cmder.On("Output", mock.Anything, mock.Anything).Return(test.GitTag, nil)
 
 			var gitAPI = git.CLI{Commander: cmder}
-			var versionAPI = API{Prefix: test.Prefix, Suffix: test.Suffix, GitAPI: gitAPI}
+			var versionAPI = API{Prefix: test.Prefix, Suffix: "", GitAPI: gitAPI}
 
-			var got, err = versionAPI.GetVersion()
+			var got, err = versionAPI.GetVersion(test.SemVerParseMode, test.SemVerPerPrefix, test.Prefix)
 
 			assert.NoError(t, err)
-			assert.Equal(t, test.Version, got, `want: "%s, got: "%s"`, test.Version, got)
+			assert.Equal(t, test.ExpectedVersion, got, `want: "%s, got: "%s"`, test.ExpectedVersion, got)
+		})
+	}
+
+	type TestWithMultipleTags struct {
+		Name            string
+		Tags            string
+		ExpectedVersion string
+		SemVerParseMode string
+		SemVerPerPrefix bool
+		Prefix          string
+	}
+
+	var tests_with_multiple_tags = []TestWithMultipleTags{
+		{Name: "GetVersionStrict", Tags: "1.0.0\n1.1.0\n2.0.0", ExpectedVersion: "2.0.0", SemVerParseMode: semverparse.Strict, SemVerPerPrefix: false, Prefix: ""},
+		{Name: "GetVersionStrictUnordered", Tags: "1.0.0\n2.0.0\n1.1.0", ExpectedVersion: "2.0.0", SemVerParseMode: semverparse.Strict, SemVerPerPrefix: false, Prefix: ""},
+		{Name: "GetVersionStrictIgnored", Tags: "1.0.0\n2.0\n1.1.0", ExpectedVersion: "1.1.0", SemVerParseMode: semverparse.Strict, SemVerPerPrefix: false, Prefix: ""},
+
+		{Name: "GetVersionTolerant", Tags: "1.0.0\n1.1.0\n2.0.0", ExpectedVersion: "2.0.0", SemVerParseMode: semverparse.Tolerant, SemVerPerPrefix: false, Prefix: ""},
+		{Name: "GetVersionTolerantCommon1", Tags: "1.0.0\n2.0\n1.1.0", ExpectedVersion: "2.0.0", SemVerParseMode: semverparse.Tolerant, SemVerPerPrefix: false, Prefix: ""},
+		{Name: "GetVersionTolerantCommon2", Tags: "1.0.0\nv2.0\n2.1", ExpectedVersion: "2.1.0", SemVerParseMode: semverparse.Tolerant, SemVerPerPrefix: false, Prefix: ""},
+		{Name: "GetVersionTolerantCommon3", Tags: "1.0.0\n1.1.0\nv2", ExpectedVersion: "2.0.0", SemVerParseMode: semverparse.Tolerant, SemVerPerPrefix: false, Prefix: ""},
+		{Name: "GetVersionTolerantCommon4", Tags: "1.0.0\nv1.1.0\n2", ExpectedVersion: "2.0.0", SemVerParseMode: semverparse.Tolerant, SemVerPerPrefix: false, Prefix: ""},
+		{Name: "GetVersionTolerantWithPrefixInConfigNotInTag1", Tags: "1.0.0\n1.1.0\n2.0.0", ExpectedVersion: "2.0.0", SemVerParseMode: semverparse.Tolerant, SemVerPerPrefix: false, Prefix: "v"},
+		{Name: "GetVersionTolerantWithPrefixInConfigNotInTag2", Tags: "1.0.0\n1.1.0\n2.0.0", ExpectedVersion: "2.0.0", SemVerParseMode: semverparse.Tolerant, SemVerPerPrefix: false, Prefix: "abc"},
+		{Name: "GetVersionTolerantWithPrefixInConfigNotInTag3", Tags: "1.0.0\n1.1.0\n2.0.0", ExpectedVersion: "2.0.0", SemVerParseMode: semverparse.Tolerant, SemVerPerPrefix: false, Prefix: "foo/"},
+		{Name: "GetVersionTolerantWithPrefixInConfigInTag", Tags: "1.0.0\n1.1.0\nv2.0.0", ExpectedVersion: "2.0.0", SemVerParseMode: semverparse.Tolerant, SemVerPerPrefix: false, Prefix: "v"},
+
+		// Configuring prefixes should not increase tolerance
+		{Name: "GetVersionTolerantWithPrefixInConfigButNotMatched1", Tags: "1.0.0\n1.1.0\nabc2.0.0", ExpectedVersion: "1.1.0", SemVerParseMode: semverparse.Tolerant, SemVerPerPrefix: false, Prefix: "abc"},
+		{Name: "GetVersionTolerantWithPrefixInConfigButNotMatched2", Tags: "1.0.0\n1.1.0\nfoo/2.0.0", ExpectedVersion: "1.1.0", SemVerParseMode: semverparse.Tolerant, SemVerPerPrefix: false, Prefix: "foo/"},
+
+		// Setting DefaultSemVerPerPrefix to true will increase tolerance
+		{Name: "GetVersionTolerantWithSemVerPerPrefix1", Tags: "1.0.0\nfoo/1\nfoo/2.0\nbar/2.1", ExpectedVersion: "1.0.0", SemVerParseMode: semverparse.Tolerant, SemVerPerPrefix: true, Prefix: ""},
+		{Name: "GetVersionTolerantWithSemVerPerPrefix3", Tags: "v1.0.0\nfoo/1\nfoo/2.0\nbar/2.1", ExpectedVersion: "1.0.0", SemVerParseMode: semverparse.Tolerant, SemVerPerPrefix: true, Prefix: "v"},
+		{Name: "GetVersionTolerantWithSemVerPerPrefix4", Tags: "foo/1.1.0\nbar/2.0.0\nbaz/3.0.0", ExpectedVersion: "1.1.0", SemVerParseMode: semverparse.Tolerant, SemVerPerPrefix: true, Prefix: "foo/"},
+		{Name: "GetVersionTolerantWithSemVerPerPrefix5", Tags: "foo/1.1.0\nbar/2.0.0\nbaz/3.0.0", ExpectedVersion: "2.0.0", SemVerParseMode: semverparse.Tolerant, SemVerPerPrefix: true, Prefix: "bar/"},
+	}
+
+	for _, test := range tests_with_multiple_tags {
+		t.Run(test.Name, func(t *testing.T) {
+			var cmder = mocks.NewMockCommander()
+			cmder.On("Output", mock.Anything, mock.Anything).Return(test.Tags, nil)
+			var gitAPI = git.CLI{Commander: cmder}
+			var versionAPI = API{Prefix: test.Prefix, Suffix: "", GitAPI: gitAPI}
+
+			var got, err = versionAPI.GetVersion(test.SemVerParseMode, test.SemVerPerPrefix, test.Prefix)
+
+			assert.NoError(t, err)
+			assert.Equal(t, test.ExpectedVersion, got, `want: "%s, got: "%s"`, test.ExpectedVersion, got)
+		})
+	}
+
+	type TestErrorWithMultipleTags struct {
+		Name   string
+		Tags   string
+		Prefix string
+		Error  error
+	}
+
+	var tests_errors_with_multiple_tags = []TestErrorWithMultipleTags{
+		{Name: "ReturnError1", Prefix: "", Tags: "foo/1.0.0\nbar/2.0.0\nbaz/3.0.0", Error: fmt.Errorf("could not find a valid semver version")},
+		{Name: "ReturnError1", Prefix: "buzz/", Tags: "foo/1.0.0\nbar/2.0.0\nbaz/3.0.0", Error: fmt.Errorf("could not find a valid semver version")},
+		{Name: "ReturnError1", Prefix: "buzz/", Tags: "1.0.0\n2.0.0\n3.0.0", Error: fmt.Errorf("could not find a valid semver version")},
+	}
+
+	for _, test := range tests_errors_with_multiple_tags {
+		t.Run(test.Name, func(t *testing.T) {
+			var cmder = mocks.NewMockCommander()
+			cmder.On("Output", mock.Anything, mock.Anything).Return(test.Tags, nil)
+			var gitAPI = git.CLI{Commander: cmder}
+			var versionAPI = API{Prefix: test.Prefix, Suffix: "", GitAPI: gitAPI}
+
+			var _, got = versionAPI.GetVersion(semverparse.Tolerant, true, test.Prefix)
+
+			assert.Error(t, got)
+			assert.Equal(t, test.Error, got, `want: "%s, got: "%s"`, test.Error, got)
 		})
 	}
 
@@ -54,7 +147,7 @@ func TestAPI_GetVersion(t *testing.T) {
 	}
 
 	var gitErrorTests = []GitErrorTest{
-		{Name: "ReturnErrorOnGitError", Prefix: "v", Suffix: "", Error: fmt.Errorf("some-error")},
+		{Name: "ReturnErrorOnGitError", Prefix: "", Suffix: "", Error: fmt.Errorf("some-error")},
 	}
 
 	for _, test := range gitErrorTests {
@@ -65,7 +158,7 @@ func TestAPI_GetVersion(t *testing.T) {
 			var gitAPI = git.CLI{Commander: cmder}
 			var versionAPI = API{Prefix: test.Prefix, Suffix: test.Suffix, GitAPI: gitAPI}
 
-			var _, got = versionAPI.GetVersion()
+			var _, got = versionAPI.GetVersion(semverparse.Tolerant, false, test.Prefix)
 
 			assert.Error(t, got)
 			assert.Equal(t, test.Error, got, `want: "%s, got: "%s"`, test.Error, got)
@@ -81,8 +174,8 @@ func TestAPI_GetVersion(t *testing.T) {
 	}
 
 	var semverErrorTests = []SemverErrorTest{
-		{Name: "ReturnErrorOnInvalidVersions", Versions: "invalid1 invalid2", Error: fmt.Errorf("could not find a valid semver version")},
 		{Name: "ReturnErrorOnNoVersions", Versions: "", Error: fmt.Errorf("could not find a valid semver version")},
+		{Name: "ReturnErrorOnInvalidVersions", Versions: "invalid1 invalid2", Error: fmt.Errorf("could not find a valid semver version")},
 	}
 
 	for _, test := range semverErrorTests {
@@ -93,7 +186,7 @@ func TestAPI_GetVersion(t *testing.T) {
 			var gitAPI = git.CLI{Commander: cmder}
 			var versionAPI = API{Prefix: test.Prefix, Suffix: test.Suffix, GitAPI: gitAPI}
 
-			var _, got = versionAPI.GetVersion()
+			var _, got = versionAPI.GetVersion(semverparse.Tolerant, false, test.Prefix)
 
 			assert.Error(t, got)
 			assert.Equal(t, test.Error, got, `want: "%s, got: "%s"`, test.Error, got)
@@ -110,7 +203,7 @@ func TestAPI_GetVersionOrDefault(t *testing.T) {
 	}
 
 	var tests = []Test{
-		{Name: "ReturnVersionWithoutError", Prefix: "v", Suffix: "", Version: "0.0.0"},
+		{Name: "GetVersionWithoutError1", Prefix: "", Suffix: "", Version: "0.1.0"},
 	}
 
 	for _, test := range tests {
@@ -121,7 +214,7 @@ func TestAPI_GetVersionOrDefault(t *testing.T) {
 			var gitAPI = git.CLI{Commander: cmder}
 			var versionAPI = API{Prefix: test.Prefix, Suffix: test.Suffix, GitAPI: gitAPI}
 
-			var got, err = versionAPI.GetVersion()
+			var got, err = versionAPI.GetVersion(semverparse.Tolerant, false, test.Prefix)
 
 			assert.NoError(t, err)
 			assert.Equal(t, test.Version, got, `want: "%s, got: "%s"`, test.Version, got)
@@ -136,7 +229,7 @@ func TestAPI_GetVersionOrDefault(t *testing.T) {
 	}
 
 	var errorTests = []ErrorTest{
-		{Name: "ReturnDefaultVersionOnGitApiError", Prefix: "v", Suffix: "", Error: fmt.Errorf("some-error")},
+		{Name: "ReturnDefaultVersionOnGitApiError", Prefix: "", Suffix: "", Error: fmt.Errorf("some-error")},
 	}
 
 	for _, test := range errorTests {
@@ -147,7 +240,7 @@ func TestAPI_GetVersionOrDefault(t *testing.T) {
 			var gitAPI = git.CLI{Commander: cmder}
 			var versionAPI = API{Prefix: test.Prefix, Suffix: test.Suffix, GitAPI: gitAPI}
 
-			var got = versionAPI.GetVersionOrDefault(cli.DefaultVersion)
+			var got = versionAPI.GetVersionOrDefault(cli.DefaultVersion, semverparse.Tolerant, false, test.Prefix)
 
 			assert.Equal(t, cli.DefaultVersion, got, `want: "%s, got: "%s"`, cli.DefaultVersion, got)
 		})
@@ -165,9 +258,9 @@ func TestAPI_PredictVersion(t *testing.T) {
 	}
 
 	var tests = []Test{
-		{Name: "ReturnPatchPrediction", Prefix: "v", Suffix: "", Mode: modes.NewPatchMode(), Version: "0.0.0", Want: "0.0.1"},
-		{Name: "ReturnMinorPrediction", Prefix: "v", Suffix: "", Mode: modes.NewMinorMode(), Version: "0.0.0", Want: "0.1.0"},
-		{Name: "ReturnMajorPrediction", Prefix: "v", Suffix: "", Mode: modes.NewMajorMode(), Version: "0.0.0", Want: "1.0.0"},
+		{Name: "ReturnPatchPrediction", Prefix: "", Suffix: "", Mode: modes.NewPatchMode(), Version: "0.0.0", Want: "0.0.1"},
+		{Name: "ReturnMinorPrediction", Prefix: "", Suffix: "", Mode: modes.NewMinorMode(), Version: "0.0.0", Want: "0.1.0"},
+		{Name: "ReturnMajorPrediction", Prefix: "", Suffix: "", Mode: modes.NewMajorMode(), Version: "0.0.0", Want: "1.0.0"},
 	}
 
 	for _, test := range tests {
@@ -194,7 +287,7 @@ func TestAPI_PredictVersion(t *testing.T) {
 	}
 
 	var errorTests = []ErrorTest{
-		{Name: "ReturnErrorOnModeIncrementError", Prefix: "v", Error: fmt.Errorf("some-error"), Version: "invalid"},
+		{Name: "ReturnErrorOnModeIncrementError", Prefix: "", Error: fmt.Errorf("some-error"), Version: "invalid"},
 	}
 
 	for _, test := range errorTests {
@@ -223,10 +316,8 @@ func TestAPI_PushVersion(t *testing.T) {
 	}
 
 	var tests = []Test{
-		{Name: "PushWithPrefix", Mode: modes.NewPatchMode(), Prefix: "v", Version: "0.0.1", Want: "v0.0.1"},
 		{Name: "PushWithoutPrefix", Mode: modes.NewPatchMode(), Prefix: "", Version: "0.0.1", Want: "0.0.1"},
-		{Name: "PushWithSuffix", Mode: modes.NewPatchMode(), Prefix: "v", Suffix: "a", Version: "0.0.1", Want: "v0.0.1a"},
-		{Name: "PushWithSuffixAlt", Mode: modes.NewPatchMode(), Prefix: "v", Suffix: "-alt", Version: "0.0.1", Want: "v0.0.1-alt"},
+		{Name: "PushWithPrefix", Mode: modes.NewPatchMode(), Prefix: "test/", Version: "0.0.1", Want: "test/0.0.1"},
 		{Name: "PushWithoutSuffix", Mode: modes.NewPatchMode(), Prefix: "", Suffix: "", Version: "0.0.1", Want: "0.0.1"},
 	}
 
@@ -282,10 +373,8 @@ func TestAPI_ReleaseVersion(t *testing.T) {
 	}
 
 	var tests = []Test{
-		{Name: "ReleaseWithPrefix", Mode: modes.NewPatchMode(), Prefix: "v", Version: "0.0.1", Want: "v0.0.1"},
 		{Name: "ReleaseWithoutPrefix", Mode: modes.NewPatchMode(), Prefix: "", Version: "0.0.1", Want: "0.0.1"},
-		{Name: "ReleaseWithSuffix", Mode: modes.NewPatchMode(), Prefix: "v", Suffix: "a", Version: "0.0.1", Want: "v0.0.1a"},
-		{Name: "ReleaseWithSuffixAlt", Mode: modes.NewPatchMode(), Prefix: "v", Suffix: "-alt", Version: "0.0.1", Want: "v0.0.1-alt"},
+		{Name: "ReleaseWithPrefix", Mode: modes.NewPatchMode(), Prefix: "test/", Version: "0.0.1", Want: "test/0.0.1"},
 		{Name: "ReleaseWithoutSuffix", Mode: modes.NewPatchMode(), Prefix: "", Suffix: "", Version: "0.0.1", Want: "0.0.1"},
 	}
 

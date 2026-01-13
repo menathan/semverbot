@@ -26,15 +26,19 @@ func PushVersionCommandRunE(cmd *cobra.Command, args []string) (err error) {
 	log.Debug().Str("command", "v1.push-version").Msg("starting run...")
 
 	var options = &core.PushVersionOptions{
-		DefaultVersion: cli.DefaultVersion,
-		GitTagsPrefix:  viper.GetString(cli.GitTagsPrefixConfigKey),
-		GitTagsSuffix:  viper.GetString(cli.GitTagsSuffixConfigKey),
+		DefaultVersion:  cli.DefaultVersion,
+		Prefix:          viper.GetString(cli.GitTagsPrefixConfigKey),
+		Suffix:          viper.GetString(cli.GitTagsSuffixConfigKey),
+		SemVerParseMode: viper.GetString(cli.SemVerParseModeConfigKey),
+		SemVerPerPrefix: viper.GetBool(cli.SemVerPerPrefixConfigKey),
 	}
 
 	log.Debug().
 		Str("default", options.DefaultVersion).
-		Str("prefix", options.GitTagsPrefix).
-		Str("suffix", options.GitTagsSuffix).
+		Str("prefix", options.Prefix).
+		Str("suffix", options.Suffix).
+		Str("semver-parse-mode", options.SemVerParseMode).
+		Bool("semver-per-prefix", options.SemVerPerPrefix).
 		Msg("options")
 
 	if err = core.PushVersion(options); err != nil {

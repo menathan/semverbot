@@ -70,6 +70,13 @@ func (api CLI) GetTags() (tags string, err error) {
 	return api.Commander.Output("git", "tag", "--sort=-version:refname")
 }
 
+// GetTagsWithPrefix gets only tags with certain prefix, both lightweight and annotated.
+// Returns a string of newline separated tags, sorted by version in descending order.
+func (api CLI) GetTagsWithPrefix(prefix string) (tags string, err error) {
+	var filter = prefix + "[0-9]*"
+	return api.Commander.Output("git", "tag", "--sort=-version:refname", "--list", filter)
+}
+
 // PushTag pushes a tag to the remote origin.
 // Returns an error if the command failed.
 func (api CLI) PushTag(tag string) (err error) {

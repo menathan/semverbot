@@ -30,17 +30,15 @@ func TestGitBranchMode_Increment(t *testing.T) {
 		BranchName string
 		Delimiters string
 		Name       string
-		Prefix     string
-		Suffix     string
 		SemverMap  semver.Map
 		Version    string
 		Want       string
 	}
 
 	var tests = []Test{
-		{Name: "IncrementPatch", BranchName: "fix/some-bug", Delimiters: "/", Prefix: "v", Suffix: "", SemverMap: semverMap, Version: "0.0.0", Want: "0.0.1"},
-		{Name: "IncrementMinor", BranchName: "feature/some-bug", Delimiters: "/", Prefix: "v", Suffix: "", SemverMap: semverMap, Version: "0.0.1", Want: "0.1.0"},
-		{Name: "IncrementMajor", BranchName: "release/some-bug", Delimiters: "/", Prefix: "v", Suffix: "", SemverMap: semverMap, Version: "0.1.0", Want: "1.0.0"},
+		{Name: "IncrementPatch", BranchName: "fix/some-bug", Delimiters: "/", SemverMap: semverMap, Version: "0.0.0", Want: "0.0.1"},
+		{Name: "IncrementMinor", BranchName: "feature/some-bug", Delimiters: "/", SemverMap: semverMap, Version: "0.0.1", Want: "0.1.0"},
+		{Name: "IncrementMajor", BranchName: "release/some-bug", Delimiters: "/", SemverMap: semverMap, Version: "0.1.0", Want: "1.0.0"},
 	}
 
 	for _, test := range tests {
@@ -51,7 +49,7 @@ func TestGitBranchMode_Increment(t *testing.T) {
 			var mode = NewGitBranchMode(test.Delimiters, test.SemverMap)
 			mode.GitAPI = gitAPI
 
-			var got, err = mode.Increment(test.Prefix, test.Suffix, test.Version)
+			var got, err = mode.Increment(test.Version)
 
 			assert.NoError(t, err)
 			assert.IsType(t, test.Want, got, `want: '%s, got: '%s'`, test.Want, got)
@@ -67,7 +65,7 @@ func TestGitBranchMode_Increment(t *testing.T) {
 		var mode = NewGitBranchMode("/", semverMap)
 		mode.GitAPI = gitAPI
 
-		var _, got = mode.Increment("v", "", "0.0.0")
+		var _, got = mode.Increment("0.0.0")
 
 		assert.Error(t, got)
 		assert.Equal(t, want, got, `want: '%s, got: '%s'`, want, got)
@@ -82,7 +80,7 @@ func TestGitBranchMode_Increment(t *testing.T) {
 		var mode = NewGitBranchMode("/", semverMap)
 		mode.GitAPI = gitAPI
 
-		var _, got = mode.Increment("v", "", "0.0.0")
+		var _, got = mode.Increment("0.0.0")
 
 		assert.Error(t, got)
 		assert.Equal(t, want, got, `want: '%s, got: '%s'`, want, got)
@@ -95,7 +93,7 @@ func TestGitBranchMode_Increment(t *testing.T) {
 		var mode = NewGitBranchMode("/", semverMap)
 		mode.GitAPI = gitAPI
 
-		var _, got = mode.Increment("v", "", "0.0.0")
+		var _, got = mode.Increment("0.0.0")
 
 		assert.Error(t, got)
 	})
@@ -107,7 +105,7 @@ func TestGitBranchMode_Increment(t *testing.T) {
 		var mode = NewGitBranchMode("/", semverMap)
 		mode.GitAPI = gitAPI
 
-		var _, got = mode.Increment("v", "", "invalid")
+		var _, got = mode.Increment("invalid")
 
 		assert.Error(t, got)
 	})

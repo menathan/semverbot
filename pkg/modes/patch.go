@@ -2,7 +2,6 @@ package modes
 
 import (
 	blangsemver "github.com/blang/semver/v4"
-
 	"github.com/restechnica/semverbot/pkg/semver"
 )
 
@@ -21,10 +20,10 @@ func NewPatchMode() PatchMode {
 
 // Increment increments a given version using the PatchMode.
 // Returns the incremented version.
-func (mode PatchMode) Increment(prefix string, suffix string, targetVersion string) (nextVersion string, err error) {
+func (mode PatchMode) Increment(targetVersion string) (nextVersion string, err error) {
 	var version blangsemver.Version
 
-	if version, err = semver.Parse(prefix, suffix, targetVersion); err != nil {
+	if version, err = semver.ParseStrict(targetVersion); err != nil {
 		return
 	}
 

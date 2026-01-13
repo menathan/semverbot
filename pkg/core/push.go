@@ -3,15 +3,17 @@ package core
 import "github.com/restechnica/semverbot/pkg/versions"
 
 type PushVersionOptions struct {
-	DefaultVersion string
-	GitTagsPrefix  string
-	GitTagsSuffix  string
+	DefaultVersion  string
+	Prefix          string
+	Suffix          string
+	SemVerPerPrefix bool
+	SemVerParseMode string
 }
 
 // PushVersion pushes the current version.
 // Returns an error if the push went wrong.
 func PushVersion(options *PushVersionOptions) (err error) {
-	var versionAPI = versions.NewAPI(options.GitTagsPrefix, options.GitTagsSuffix)
-	var version = versionAPI.GetVersionOrDefault(options.DefaultVersion)
+	var versionAPI = versions.NewAPI(options.Prefix, options.Suffix)
+	var version = versionAPI.GetVersionOrDefault(options.DefaultVersion, options.SemVerParseMode, options.SemVerPerPrefix, options.Prefix)
 	return versionAPI.PushVersion(version)
 }

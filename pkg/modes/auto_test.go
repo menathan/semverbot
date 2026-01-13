@@ -23,8 +23,6 @@ func TestAutoMode_Increment(t *testing.T) {
 	type Test struct {
 		Modes   []Mode
 		Name    string
-		Prefix  string
-		Suffix  string
 		Version string
 		Want    string
 	}
@@ -33,16 +31,16 @@ func TestAutoMode_Increment(t *testing.T) {
 	mockMode.On("Increment", mock.Anything, mock.Anything, mock.Anything).Return("", fmt.Errorf("some-error"))
 
 	var tests = []Test{
-		{Name: "IncrementMajor", Prefix: "v", Suffix: "", Modes: []Mode{NewMajorMode()}, Version: "0.0.0", Want: "1.0.0"},
-		{Name: "IncrementMinor", Prefix: "v", Suffix: "", Modes: []Mode{NewMinorMode()}, Version: "0.0.0", Want: "0.1.0"},
-		{Name: "IncrementPatch", Prefix: "v", Suffix: "", Modes: []Mode{NewPatchMode()}, Version: "0.0.0", Want: "0.0.1"},
-		{Name: "DefaultToPatchIfModeSliceEmpty", Prefix: "v", Suffix: "", Modes: []Mode{}, Version: "0.0.0", Want: "0.0.1"},
-		{Name: "IncrementWithSecondModeAfterFirstFailed", Prefix: "v", Suffix: "", Modes: []Mode{mockMode, NewMinorMode()}, Version: "0.0.0", Want: "0.1.0"},
+		{Name: "IncrementMajor", Modes: []Mode{NewMajorMode()}, Version: "0.0.0", Want: "1.0.0"},
+		{Name: "IncrementMinor", Modes: []Mode{NewMinorMode()}, Version: "0.0.0", Want: "0.1.0"},
+		{Name: "IncrementPatch", Modes: []Mode{NewPatchMode()}, Version: "0.0.0", Want: "0.0.1"},
+		{Name: "DefaultToPatchIfModeSliceEmpty", Modes: []Mode{}, Version: "0.0.0", Want: "0.0.1"},
+		{Name: "IncrementWithSecondModeAfterFirstFailed", Modes: []Mode{mockMode, NewMinorMode()}, Version: "0.0.0", Want: "0.1.0"},
 	}
 
 	for _, test := range tests {
 		var mode = NewAutoMode(test.Modes)
-		var got, err = mode.Increment(test.Prefix, test.Suffix, test.Version)
+		var got, err = mode.Increment(test.Version)
 
 		assert.NoError(t, err)
 		assert.IsType(t, test.Want, got, `want: "%s, got: "%s"`, test.Want, got)

@@ -27,12 +27,20 @@ func GetVersionCommandRun(cmd *cobra.Command, args []string) {
 	log.Debug().Str("command", "v1.get-version").Msg("starting run...")
 
 	var options = &core.GetVersionOptions{
-		GitTagPrefix:   viper.GetString(cli.GitTagsPrefixConfigKey),
-		GitTagSuffix:   viper.GetString(cli.GitTagsSuffixConfigKey),
-		DefaultVersion: cli.DefaultVersion,
+		DefaultVersion:  cli.DefaultVersion,
+		Prefix:          viper.GetString(cli.GitTagsPrefixConfigKey),
+		Suffix:          viper.GetString(cli.GitTagsSuffixConfigKey),
+		SemVerParseMode: viper.GetString(cli.SemVerParseModeConfigKey),
+		SemVerPerPrefix: viper.GetBool(cli.SemVerPerPrefixConfigKey),
 	}
 
-	log.Debug().Str("default", options.DefaultVersion).Msg("options")
+	log.Debug().
+		Str("default", options.DefaultVersion).
+		Str("prefix", options.Prefix).
+		Str("suffix", options.Suffix).
+		Str("semver-parse-mode", options.SemVerParseMode).
+		Bool("semver-per-prefix", options.SemVerPerPrefix).
+		Msg("options")
 
 	var version = core.GetVersion(options)
 	fmt.Println(version)

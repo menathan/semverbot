@@ -159,6 +159,10 @@ patch = ["fix", "bug"]
 minor = ["feature"]
 major = ["release"]
 
+[semver.config]
+parse-mode = "tolerant"
+per-prefix = false
+
 [modes]
 
 [modes.git-branch]
@@ -204,9 +208,9 @@ Note: `sbot` will always display the version without the prefix.
 
 ### git.tags.suffix
 
-In case you need a version suffix, this option enables you to set whatever you would like to work with.
-By default, no suffix is used.
+In case you need a version suffix, this option enables you to set whatever you would like to work with as long as the suffix meets the Semver 2.0.0 specification. This is the case with suffixes such as `-alpha` or `-prerelease+meta`.
 
+By default, no suffix is used.
 Note: `sbot` will always display the version without the suffix.
 
 ### semver
@@ -217,6 +221,28 @@ A mapping of semver levels and words, which are matched against git information.
 Whenever a match happens, `sbot` will increment the corresponding level.
 
 See [Modes](#modes) for documentation about the supported modes.
+
+### semver.config.parse-mode
+
+The parse mode determines how strict semver parsing is. Default is `tolerant`.
+
+- **`tolerant`** (default): Allows common variations like the `v` prefix (e.g., `v1.0.0`) and incomplete versions (e.g., `2.1`). Also supports SemVer 2.0.0 prerelease and build metadata (e.g., `1.0.0-alpha`, `1.0.0+build`, `1.0.0-pre+build`).
+
+- **`strict`**: Requires exact SemVer 2.0.0 format without prefixes or incomplete versions. However, it **does allow** SemVer-compliant prerelease and build metadata, such as:
+  - `1.0.0-alpha` (prerelease)
+  - `1.0.0+build.123` (build metadata)
+  - `1.0.0-pre+build` (both prerelease and build metadata)
+  
+  Strict mode will reject versions like `v1.0.0` (prefix) or `2.1` (incomplete).
+
+### semver.config.per-prefix
+
+The per-prefix option allows for using different prefixes for different semver levels. This is useful when you have 
+different prefixes for different applications or components, that you want to version independently of each other, which
+is common in a monorepo setup.
+
+Setting this option to true also allows for even more tolerant tag parsing, as the prefix is always used to determine 
+the semver level, regardless of the semver parse mode.
 
 ### modes
 
@@ -250,7 +276,7 @@ version of the configuration property name, prefixed with `SBOT_`. For example, 
 property, you can set the `SBOT_GIT_TAGS_SUFFIX` environment variable.
 
 ```shell
-export SBOT_GIT_TAGS_SUFFIX="-beta"
+export SBOT_GIT_TAGS_SUFFIX="-pre+build" 
 sbot release version
 ```
 

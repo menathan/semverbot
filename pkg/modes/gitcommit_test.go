@@ -30,18 +30,16 @@ func TestGitCommitMode_Increment(t *testing.T) {
 		CommitMessage string
 		Delimiters    string
 		Name          string
-		Prefix        string
-		Suffix        string
 		SemverMap     semver.Map
 		Version       string
 		Want          string
 	}
 
 	var tests = []Test{
-		{Name: "IncrementPatch", CommitMessage: "fix] some-bug", Delimiters: "[]", Prefix: "v", Suffix: "", SemverMap: semverMap, Version: "0.0.0", Want: "0.0.1"},
-		{Name: "IncrementPatch", CommitMessage: "[fi] some/bug", Delimiters: "/", Prefix: "v", Suffix: "", SemverMap: semverMap, Version: "0.0.0", Want: "0.0.1"},
-		{Name: "IncrementMinor", CommitMessage: "[feature] some-feat", Delimiters: "[]", Prefix: "v", Suffix: "", SemverMap: semverMap, Version: "0.0.1", Want: "0.1.0"},
-		{Name: "IncrementMajor", CommitMessage: "[release] some-release", Delimiters: "[]", Prefix: "v", Suffix: "", SemverMap: semverMap, Version: "0.1.0", Want: "1.0.0"},
+		{Name: "IncrementPatch", CommitMessage: "fix] some-bug", Delimiters: "[]", SemverMap: semverMap, Version: "0.0.0", Want: "0.0.1"},
+		{Name: "IncrementPatch", CommitMessage: "[fi] some/bug", Delimiters: "/", SemverMap: semverMap, Version: "0.0.0", Want: "0.0.1"},
+		{Name: "IncrementMinor", CommitMessage: "[feature] some-feat", Delimiters: "[]", SemverMap: semverMap, Version: "0.0.1", Want: "0.1.0"},
+		{Name: "IncrementMajor", CommitMessage: "[release] some-release", Delimiters: "[]", SemverMap: semverMap, Version: "0.1.0", Want: "1.0.0"},
 	}
 
 	for _, test := range tests {
@@ -52,7 +50,7 @@ func TestGitCommitMode_Increment(t *testing.T) {
 			var mode = NewGitCommitMode(test.Delimiters, test.SemverMap)
 			mode.GitAPI = gitAPI
 
-			var got, err = mode.Increment(test.Prefix, test.Suffix, test.Version)
+			var got, err = mode.Increment(test.Version)
 
 			assert.NoError(t, err)
 			assert.IsType(t, test.Want, got, `want: '%s, got: '%s'`, test.Want, got)
@@ -68,7 +66,7 @@ func TestGitCommitMode_Increment(t *testing.T) {
 		var mode = NewGitCommitMode("[]", semverMap)
 		mode.GitAPI = gitAPI
 
-		var _, got = mode.Increment("v", "", "0.0.0")
+		var _, got = mode.Increment("0.0.0")
 
 		assert.Error(t, got)
 		assert.Equal(t, want, got, `want: '%s, got: '%s'`, want, got)
@@ -81,7 +79,7 @@ func TestGitCommitMode_Increment(t *testing.T) {
 		var mode = NewGitCommitMode("/", semverMap)
 		mode.GitAPI = gitAPI
 
-		var _, got = mode.Increment("v", "", "0.0.0")
+		var _, got = mode.Increment("0.0.0")
 
 		assert.Error(t, got)
 	})
@@ -93,7 +91,7 @@ func TestGitCommitMode_Increment(t *testing.T) {
 		var mode = NewGitCommitMode("[]", semverMap)
 		mode.GitAPI = gitAPI
 
-		var _, got = mode.Increment("v", "", "invalid")
+		var _, got = mode.Increment("invalid")
 
 		assert.Error(t, got)
 	})
