@@ -3,8 +3,8 @@ package modes
 import (
 	"fmt"
 
-	"github.com/restechnica/semverbot/internal/util"
-	"github.com/restechnica/semverbot/pkg/semver"
+	"github.com/menathan/semverbot/internal/util"
+	"github.com/menathan/semverbot/pkg/semver"
 )
 
 func DetectModeFromString(str string, semverMap semver.Map, delimiters string) (detected Mode, err error) {

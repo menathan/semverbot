@@ -1,8 +1,8 @@
 package internal
 
 import (
-	"github.com/restechnica/semverbot/pkg/modes"
-	"github.com/restechnica/semverbot/pkg/semver/semverparse"
+	"github.com/menathan/semverbot/pkg/modes"
+	"github.com/menathan/semverbot/pkg/semver/semverparse"
 )
 
 const (

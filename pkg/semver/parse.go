@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	blangsemver "github.com/blang/semver/v4"
-	"github.com/restechnica/semverbot/pkg/semver/semverparse"
+	"github.com/menathan/semverbot/pkg/semver/semverparse"
 )
 
 // ParseStrict parses a version string into a semver version struct.

@@ -3,7 +3,7 @@ package semver
 import (
 	"testing"
 
-	"github.com/restechnica/semverbot/pkg/semver/semverparse"
+	"github.com/menathan/semverbot/pkg/semver/semverparse"
 
 	"github.com/stretchr/testify/assert"
 )

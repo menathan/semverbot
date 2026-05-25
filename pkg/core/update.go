@@ -1,7 +1,7 @@
 package core
 
 import (
-	"github.com/restechnica/semverbot/pkg/versions"
+	"github.com/menathan/semverbot/pkg/versions"
 )
 
 // UpdateVersion fetches the latest tags from the git repository.

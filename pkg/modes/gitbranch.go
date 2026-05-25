@@ -3,8 +3,8 @@ package modes
 import (
 	"fmt"
 
-	"github.com/restechnica/semverbot/pkg/git"
-	"github.com/restechnica/semverbot/pkg/semver"
+	"github.com/menathan/semverbot/pkg/git"
+	"github.com/menathan/semverbot/pkg/semver"
 )
 
 // GitBranch mode name for GitBranchMode.

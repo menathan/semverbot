@@ -1,8 +1,8 @@
 package v1
 
 import (
-	"github.com/restechnica/semverbot/pkg/cli"
-	"github.com/restechnica/semverbot/pkg/core"
+	"github.com/menathan/semverbot/pkg/cli"
+	"github.com/menathan/semverbot/pkg/core"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )

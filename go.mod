@@ -1,4 +1,4 @@
-module github.com/restechnica/semverbot
+module github.com/menathan/semverbot
 
 go 1.20
 

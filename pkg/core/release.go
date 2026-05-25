@@ -1,7 +1,7 @@
 package core
 
 import (
-	"github.com/restechnica/semverbot/pkg/versions"
+	"github.com/menathan/semverbot/pkg/versions"
 )
 
 // ReleaseVersion releases a new version.

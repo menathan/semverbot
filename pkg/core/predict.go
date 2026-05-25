@@ -1,9 +1,9 @@
 package core
 
 import (
-	"github.com/restechnica/semverbot/pkg/modes"
-	"github.com/restechnica/semverbot/pkg/semver"
-	"github.com/restechnica/semverbot/pkg/versions"
+	"github.com/menathan/semverbot/pkg/modes"
+	"github.com/menathan/semverbot/pkg/semver"
+	"github.com/menathan/semverbot/pkg/versions"
 )
 
 type PredictVersionOptions struct {

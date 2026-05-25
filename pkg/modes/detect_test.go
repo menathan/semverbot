@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/restechnica/semverbot/pkg/semver"
+	"github.com/menathan/semverbot/pkg/semver"
 )
 
 func TestDetectModeFromString(t *testing.T) {

@@ -5,9 +5,9 @@ import (
 
 	"github.com/rs/zerolog/log"
 
-	"github.com/restechnica/semverbot/pkg/git"
-	"github.com/restechnica/semverbot/pkg/modes"
-	"github.com/restechnica/semverbot/pkg/semver"
+	"github.com/menathan/semverbot/pkg/git"
+	"github.com/menathan/semverbot/pkg/modes"
+	"github.com/menathan/semverbot/pkg/semver"
 )
 
 // API an API to work with versions.

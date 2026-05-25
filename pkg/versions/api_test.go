@@ -8,12 +8,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/restechnica/semverbot/internal/fakes"
-	"github.com/restechnica/semverbot/internal/mocks"
-	"github.com/restechnica/semverbot/pkg/cli"
-	"github.com/restechnica/semverbot/pkg/git"
-	"github.com/restechnica/semverbot/pkg/modes"
-	"github.com/restechnica/semverbot/pkg/semver/semverparse"
+	"github.com/menathan/semverbot/internal/fakes"
+	"github.com/menathan/semverbot/internal/mocks"
+	"github.com/menathan/semverbot/pkg/cli"
+	"github.com/menathan/semverbot/pkg/git"
+	"github.com/menathan/semverbot/pkg/modes"
+	"github.com/menathan/semverbot/pkg/semver/semverparse"
 )
 
 func init() {

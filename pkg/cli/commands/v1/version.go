@@ -8,8 +8,8 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 
-	"github.com/restechnica/semverbot/internal/ldflags"
-	"github.com/restechnica/semverbot/pkg/cli"
+	"github.com/menathan/semverbot/internal/ldflags"
+	"github.com/menathan/semverbot/pkg/cli"
 )
 
 // NewVersionCommand creates a new version command.

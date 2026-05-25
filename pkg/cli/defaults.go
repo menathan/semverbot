@@ -3,7 +3,7 @@ package cli
 import (
 	"fmt"
 
-	"github.com/restechnica/semverbot/internal"
+	"github.com/menathan/semverbot/internal"
 )
 
 var (

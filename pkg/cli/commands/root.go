@@ -10,11 +10,11 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/restechnica/semverbot/pkg/cli"
-	v1 "github.com/restechnica/semverbot/pkg/cli/commands/v1"
-	"github.com/restechnica/semverbot/pkg/ext/viperx"
-	"github.com/restechnica/semverbot/pkg/git"
-	"github.com/restechnica/semverbot/pkg/semver"
+	"github.com/menathan/semverbot/pkg/cli"
+	v1 "github.com/menathan/semverbot/pkg/cli/commands/v1"
+	"github.com/menathan/semverbot/pkg/ext/viperx"
+	"github.com/menathan/semverbot/pkg/git"
+	"github.com/menathan/semverbot/pkg/semver"
 )
 
 func init() {

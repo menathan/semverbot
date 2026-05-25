@@ -4,8 +4,8 @@ import (
 	"errors"
 	"os"
 
-	"github.com/restechnica/semverbot/pkg/cli"
-	"github.com/restechnica/semverbot/pkg/cli/commands"
+	"github.com/menathan/semverbot/pkg/cli"
+	"github.com/menathan/semverbot/pkg/cli/commands"
 	"github.com/rs/zerolog/log"
 )
 

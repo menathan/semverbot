@@ -6,8 +6,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/restechnica/semverbot/internal/mocks"
-	"github.com/restechnica/semverbot/pkg/semver"
+	"github.com/menathan/semverbot/internal/mocks"
+	"github.com/menathan/semverbot/pkg/semver"
 )
 
 func TestGitBranchMode_GitBranchConstant(t *testing.T) {

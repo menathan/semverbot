@@ -3,7 +3,7 @@ package modes
 import (
 	blangsemver "github.com/blang/semver/v4"
 
-	"github.com/restechnica/semverbot/pkg/semver"
+	"github.com/menathan/semverbot/pkg/semver"
 )
 
 // Minor semver version level for minor

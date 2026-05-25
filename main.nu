@@ -36,7 +36,7 @@ def build-local [build_options: list<string>] {
 }
 
 def get-ldflags [version: string] {
-    const go_import_path = "github.com/restechnica/semverbot"
+    const go_import_path = "github.com/menathan/semverbot"
 
     let ldflags = [
         $"-X ($go_import_path)/internal/ldflags.Version=($version)"

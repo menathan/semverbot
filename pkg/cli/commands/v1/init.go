@@ -6,8 +6,8 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 
-	"github.com/restechnica/semverbot/pkg/cli"
-	"github.com/restechnica/semverbot/pkg/core"
+	"github.com/menathan/semverbot/pkg/cli"
+	"github.com/menathan/semverbot/pkg/core"
 )
 
 // NewInitCommand creates a new init command.

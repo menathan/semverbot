@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/restechnica/semverbot/internal/mocks"
+	"github.com/menathan/semverbot/internal/mocks"
 )
 
 func TestCLI_CreateAnnotatedTag(t *testing.T) {
