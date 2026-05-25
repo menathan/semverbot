@@ -4,6 +4,9 @@ SemverBot
 Originally developed by the contributors of
 github.com/restechnica/semverbot under the Mozilla Public License 2.0.
 
+Forked from upstream commit 0ee02a0 (upstream release v1.7.2,
+2024-09-23).
+
 This fork (github.com/menathan/semverbot) contains modifications and
 additional contributions, Copyright (c) 2024-2026 Nathan Melis and
 contributors, also released under the Mozilla Public License 2.0.

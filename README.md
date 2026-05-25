@@ -12,6 +12,8 @@ A CLI which automates semver versioning.
 
 This is a fork of [restechnica/semverbot](https://github.com/restechnica/semverbot), maintained at [menathan/semverbot](https://github.com/menathan/semverbot). Upstream development has been quiet, and this fork ships changes we needed in production that hadn't landed there.
 
+**Fork point:** upstream commit [`0ee02a0`](https://github.com/restechnica/semverbot/commit/0ee02a0), which is upstream's `v1.7.2` release (2024-09-23). This fork uses its own version numbering starting at `v0.x` rather than continuing the upstream sequence, since the public contract may diverge.
+
 What this fork adds on top of upstream:
 
 * **Tolerant vs strict semver parsing** — pick how the bot reacts to git tags that don't strictly conform to semver. `tolerant` mode coerces near-misses (e.g. `v1.2` → `v1.2.0`) instead of erroring; `strict` mode keeps the original behaviour. See [Configuration properties](#configuration-properties).
