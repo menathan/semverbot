@@ -1,19 +1,32 @@
 # SemverBot
 
-[![github.com release badge](https://img.shields.io/github/release/restechnica/semverbot.svg)](https://github.com/restechnica/semverbot/)
-[![github.com workflow badge](https://github.com/restechnica/semverbot/workflows/main/badge.svg)](https://github.com/restechnica/semverbot/actions?query=workflow%3Amain)
-[![go.pkg.dev badge](https://pkg.go.dev/badge/github.com/restechnica/semverbot)](https://pkg.go.dev/github.com/restechnica/semverbot)
-[![goreportcard.com badge](https://goreportcard.com/badge/github.com/restechnica/semverbot)](https://goreportcard.com/report/github.com/restechnica/semverbot)
-[![img.shields.io MPL2 license badge](https://img.shields.io/github/license/restechnica/semverbot)](./LICENSE)
+[![github.com release badge](https://img.shields.io/github/release/menathan/semverbot.svg)](https://github.com/menathan/semverbot/)
+[![github.com workflow badge](https://github.com/menathan/semverbot/workflows/main/badge.svg)](https://github.com/menathan/semverbot/actions?query=workflow%3Amain)
+[![go.pkg.dev badge](https://pkg.go.dev/badge/github.com/menathan/semverbot)](https://pkg.go.dev/github.com/menathan/semverbot)
+[![goreportcard.com badge](https://goreportcard.com/badge/github.com/menathan/semverbot)](https://goreportcard.com/report/github.com/menathan/semverbot)
+[![img.shields.io MPL2 license badge](https://img.shields.io/github/license/menathan/semverbot)](./LICENSE)
 
 A CLI which automates semver versioning.
 
+## About this fork
+
+This is a fork of [restechnica/semverbot](https://github.com/restechnica/semverbot), maintained at [menathan/semverbot](https://github.com/menathan/semverbot). Upstream development has been quiet, and this fork ships changes we needed in production that hadn't landed there.
+
+What this fork adds on top of upstream:
+
+* **Tolerant vs strict semver parsing** — pick how the bot reacts to git tags that don't strictly conform to semver. `tolerant` mode coerces near-misses (e.g. `v1.2` → `v1.2.0`) instead of erroring; `strict` mode keeps the original behaviour. See [Configuration properties](#configuration-properties).
+* **Per-prefix version tracking** (`semver.config.per-prefix`) — when enabled, version history is tracked independently per tag prefix. Useful for monorepos that release multiple components from one repo with prefixes like `api-v1.2.0`, `web-v0.4.1`.
+* **Stricter tag filtering** — `GetTagsWithPrefix` filters via regex so non-version tags sharing a prefix (e.g. `v-archive`, `v-backup`) no longer pollute version prediction.
+* **Own release pipeline** — this fork publishes its own binaries to [GitHub Releases on menathan/semverbot](https://github.com/menathan/semverbot/releases) via the `main` workflow.
+
+If your use case is covered by upstream, you're better off using the original.
+
 ## Table of Contents
 
+* [About this fork](#about-this-fork)
 * [Requirements](#requirements)
 * [How to install](#how-to-install)
   * [Github](#github)
-  * [Homebrew](#homebrew)
 * [Usage](#usage)
 * [Modes](#modes)
 * [How to configure](#how-to-configure)
@@ -27,7 +40,7 @@ A CLI which automates semver versioning.
 
 ## How to install
 
-`sbot` can be retrieved from GitHub or a Homebrew tap. Run `sbot -h` to validate the installation.
+`sbot` can be retrieved from GitHub. Run `sbot -h` to validate the installation.
 The tool is available for Windows, Linux and macOS.
 
 ### github
@@ -38,17 +51,8 @@ The tool is available for Windows, Linux and macOS.
 SEMVERBOT_VERSION=1.0.0
 mkdir bin
 echo "$(pwd)/bin" >> $GITHUB_PATH
-curl -o bin/sbot -L https://github.com/restechnica/semverbot/releases/download/v$SEMVERBOT_VERSION/sbot-linux-amd64
+curl -o bin/sbot -L https://github.com/menathan/semverbot/releases/download/v$SEMVERBOT_VERSION/sbot-linux-amd64
 chmod +x bin/sbot
-```
-
-### homebrew
-
-`sbot` is available through the public tap [github.com/restechnica/homebrew-tap](https://github.com/restechnica/homebrew-tap)
-
-```shell
-brew tap restechnica/tap git@github.com:restechnica/homebrew-tap.git
-brew install restechnica/tap/semverbot
 ```
 
 ### golang
@@ -56,7 +60,7 @@ brew install restechnica/tap/semverbot
 `sbot` is written in golang, which means you can use `go install`. Make sure the installation folder, which depends on your golang setup, is in your system PATH.
 
 ```shell
-go install github.com/restechnica/semverbot/cmd/sbot@v1.0.0
+go install github.com/menathan/semverbot/cmd/sbot@latest
 ```
 
 ## Usage
@@ -303,7 +307,7 @@ These commands are basically all you need to work with `sbot` locally.
 SEMVERBOT_VERSION=1.0.0
 mkdir bin
 echo "$(pwd)/bin" >> $GITHUB_PATH
-curl -o bin/sbot -L https://github.com/restechnica/semverbot/releases/download/v$SEMVERBOT_VERSION/sbot-linux-amd64
+curl -o bin/sbot -L https://github.com/menathan/semverbot/releases/download/v$SEMVERBOT_VERSION/sbot-linux-amd64
 chmod +x bin/sbot
 
 # preparation
@@ -346,7 +350,7 @@ jobs:
 
       - name: install semverbot
         run: |
-          curl -o bin/sbot -L https://github.com/restechnica/semverbot/releases/download/v$SEMVERBOT_VERSION/sbot-linux-amd64
+          curl -o bin/sbot -L https://github.com/menathan/semverbot/releases/download/v$SEMVERBOT_VERSION/sbot-linux-amd64
           chmod +x bin/sbot
           
       - name: update version
