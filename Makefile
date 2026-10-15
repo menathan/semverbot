@@ -13,7 +13,7 @@ build-all:
 # run quality assessment checks
 check:
 	@echo "Running go version check ..."
-	@go version | grep -q 'go1.21' || (echo "Go version 1.21 required. Your version is '$$(go version)'" && exit 1)
+	@go version | grep -q 'go1.26' || (echo "Go version 1.26 required. Your version is '$$(go version)'" && exit 1)
 	@echo "Ok!"
 
 	@echo "Running gofmt ..."
