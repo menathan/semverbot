@@ -4,3 +4,10 @@
 # Project
 bin
 out
+
+# Agents' scratch folders and inboxes, which an agent writes in any repo (codetpl-base)
+.scratch/
+.handoffs/
+.explore/
+.worktrees/
+.agent.inbox*.md
